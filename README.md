@@ -1,2 +1,303 @@
-# ai-native-fullstack-workflow
-An AI-native software engineering workflow that transforms GitHub issues into production-ready code through autonomous planning, coding, testing, verification, AI review and CI/CD quality gates.
+# AI-Native Fullstack Workflow
+
+An AI-native software engineering workflow that transforms GitHub issues into production-ready code through autonomous planning, coding, testing, verification, AI review, and CI/CD quality gates.
+
+---
+
+## Overview
+
+This project demonstrates how modern AI coding agents can reliably transform an ambiguous software requirement into production-ready software through a controlled, repeatable engineering pipeline.
+
+### The Workflow
+
+```
+GitHub Issue
+     ↓
+Planner Agent
+     ↓
+Specification
+     ↓
+Implementation Tasks
+     ↓
+Coding Agent
+     ↓
+Code + Tests
+     ↓
+Verification Harness
+     ↓
+AI Reviewer
+     ↓
+GitHub PR
+     ↓
+CI Quality Gates
+     ↓
+Human Approval
+     ↓
+Deployment
+```
+
+---
+
+## Features
+
+### AI-Native Development
+
+- **Autonomous Planning** - AI agents analyze requirements and create implementation specifications
+- **Agent Coding** - AI agents implement features following defined rules
+- **Automated Verification** - Deterministic checks ensure code quality
+- **AI Review** - Optional AI code review for additional quality assurance
+- **CI/CD Integration** - GitHub Actions provide quality gates
+
+### Project Management System (Demo Application)
+
+The demo application is a Project Management System with:
+
+- **User Management** - User accounts and authentication
+- **Project Management** - Create and manage projects
+- **Task Tracking** - Tasks with TODO, IN_PROGRESS, and DONE statuses
+- **Comments** - Discussion threads on tasks
+
+---
+
+## Tech Stack
+
+### Frontend
+- **Next.js** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+
+### Backend
+- **NestJS** - Structured Node.js framework
+- **TypeScript** - Type-safe API development
+- **TypeORM** - Database ORM
+- **PostgreSQL** - Relational database
+
+### Testing
+- **Jest** - Unit and integration testing
+- **Playwright** - E2E testing
+
+### Infrastructure
+- **Docker Compose** - Local development environment
+- **GitHub Actions** - CI/CD automation
+
+### AI Tools
+- **Claude Code** - AI coding agent
+- **MCP Server** - Model Context Protocol server for agent tools
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js v20 LTS or higher
+- Yarn v1.22+
+- Docker and Docker Compose
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/ai-native-fullstack-workflow.git
+cd ai-native-fullstack-workflow
+
+# Install dependencies
+yarn install
+
+# Start PostgreSQL
+docker-compose up -d postgres
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Run database migrations
+yarn migration:run
+```
+
+### Development
+
+```bash
+# Start backend (Terminal 1)
+cd apps/backend
+yarn start:dev
+
+# Start frontend (Terminal 2)
+cd apps/frontend
+yarn dev
+```
+
+Visit http://localhost:3000 for the frontend and http://localhost:3001 for the API.
+
+---
+
+## Documentation
+
+- **[AGENTS.md](AGENTS.md)** - AI coding agent rules and guidelines
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design decisions
+- **[DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md)** - AI-native development process
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+
+---
+
+## Development Workflow
+
+### For Human Contributors
+
+1. Create an issue describing the change
+2. Create a feature branch
+3. Implement changes following [AGENTS.md](AGENTS.md) rules
+4. Write tests for your changes
+5. Run `yarn verify` to validate
+6. Commit with conventional commits
+7. Create a pull request
+
+### For AI Agents
+
+AI agents follow the automated workflow:
+
+1. **Planner Agent** analyzes the issue and creates a specification
+2. **Coding Agent** implements the specification following AGENTS.md rules
+3. **Verification Harness** runs type checking, linting, and tests
+4. **AI Reviewer** performs optional code review
+5. **GitHub PR** is created for human approval
+6. **CI/CD** runs quality gates on the PR
+7. **Human Approval** is required for merge
+
+See [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) for details.
+
+---
+
+## Verification
+
+All changes must pass verification:
+
+```bash
+yarn verify
+```
+
+This runs:
+- TypeScript type checking
+- ESLint
+- Unit tests
+- E2E tests
+- Production build
+
+---
+
+## Repository Structure
+
+```
+ai-native-fullstack-workflow/
+├── apps/
+│   ├── frontend/          # Next.js application
+│   └── backend/           # NestJS application
+├── packages/
+│   ├── shared-types/      # Shared TypeScript types
+│   └── shared-utils/      # Shared utilities
+├── mcp-server/            # Model Context Protocol server
+├── scripts/               # Automation scripts
+├── docs/                  # Additional documentation
+├── AGENTS.md              # AI agent rules
+├── ARCHITECTURE.md        # System architecture
+├── DEVELOPMENT_WORKFLOW.md # Development process
+├── CONTRIBUTING.md        # Contribution guidelines
+└── README.md              # This file
+```
+
+---
+
+## Current Status
+
+### Phase 1: Foundation ✅
+
+- [x] Repository structure
+- [x] Documentation and architecture
+- [x] AI agent rules
+- [x] Development workflow
+
+### Phase 2: Infrastructure (Planned)
+
+- [ ] Monorepo setup (Yarn workspaces)
+- [ ] TypeScript configuration
+- [ ] ESLint configuration
+- [ ] Docker Compose for PostgreSQL
+
+### Phase 3: MVP Application (Planned)
+
+- [ ] Basic CRUD for Users, Projects, Tasks
+- [ ] REST API
+- [ ] Basic UI
+
+### Phase 4: Testing & Verification (Planned)
+
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] E2E tests
+- [ ] Verification harness
+
+### Phase 5: AI Agent Integration (Planned)
+
+- [ ] MCP server
+- [ ] Planner Agent
+- [ ] Coding Agent integration
+- [ ] GitHub Actions workflows
+
+---
+
+## Contributing
+
+We welcome contributions from both humans and AI agents!
+
+### Human Contributors
+
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+2. Read [AGENTS.md](AGENTS.md) for code standards
+3. Create an issue or pick up an existing one
+4. Follow the development workflow
+5. Submit a pull request
+
+### AI Agent Contributors
+
+AI agents should:
+
+1. Follow all rules in [AGENTS.md](AGENTS.md)
+2. Read code before modifying it
+3. Write tests alongside implementation
+4. Never skip verification
+5. Clearly communicate changes
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+## Project Goals
+
+This project aims to demonstrate:
+
+1. **Specification before implementation** - Clear requirements lead to better code
+2. **Deterministic verification** - Code quality is measurable, not opinion-based
+3. **AI as a tool, not a replacement** - AI assists, humans approve
+4. **Reproducible workflows** - Every important step is documented and repeatable
+5. **Quality gates** - Multiple validation layers ensure reliability
+
+---
+
+## Acknowledgments
+
+Built with:
+- [Claude Code](https://claude.ai/code) - AI coding assistant
+- [Next.js](https://nextjs.org/) - React framework
+- [NestJS](https://nestjs.com/) - Node.js framework
+- [TypeORM](https://typeorm.io/) - Database ORM
+
+---
+
+## Contact
+
+For questions, suggestions, or issues, please create a GitHub issue or start a discussion.
