@@ -102,7 +102,7 @@ The ai-native-fullstack-workflow is a **monorepo** application demonstrating an 
 | **Yarn Workspaces** | Monorepo management | Proven, simple, efficient dependency management |
 | **Docker** | Containerization | Consistent development and deployment environments |
 | **GitHub Actions** | CI/CD | Native GitHub integration, no additional tools needed |
-| **Jest** | Testing | Built-in with NestJS, excellent TypeScript support |
+| **Vitest** | Testing | Native ESM support (required by NestJS 12), fast, TypeScript-first |
 | **Playwright** | E2E Testing | Reliable browser automation, good TypeScript support |
 | **Claude Code** | AI Coding Agent | Advanced reasoning, good context understanding |
 
@@ -590,6 +590,48 @@ For production deployment, the system would use:
 - Potential over-fetching of data
 - Multiple requests for related data
 - Trade-off acceptable for MVP
+
+---
+
+### ADR-004: Vitest instead of Jest
+
+**Decision**: Use Vitest as the single test runner across the monorepo.
+
+**Rationale**:
+- NestJS 12 ships ESM-only packages; Jest's CJS sandbox cannot load
+  them (transpilation breaks on `import.meta.url` usage in Nest
+  internals).
+- Vitest runs ESM natively and is the runner scaffolded by NestJS 12
+  for ESM projects.
+- One runner for shared packages, backend unit tests, and e2e tests
+  keeps the verification harness simple.
+
+**Consequences**:
+- Test globals come from `vitest/globals` instead of `@types/jest`.
+- `vi.mock` replaces `jest.mock` in mocking patterns.
+
+---
+
+### ADR-005: Database-optional boot
+
+**Decision**: The backend starts successfully with or without
+`DATABASE_URL`. The `DatabaseModule` registers the TypeORM connection
+only when the variable is present; the health endpoint reports
+`database: 'connected' | 'unconfigured'` accordingly.
+
+**Rationale**:
+- The skeleton phase (and CI without a database service) stays
+  deterministic: `yarn verify` passes on machines with no PostgreSQL.
+- The health endpoint tells the truth about persistence instead of
+  failing to boot.
+
+**Consequences**:
+- Phase 3 (entities) will make the database a hard requirement; the
+  condition in `DatabaseModule.register()` becomes a startup error
+  when `DATABASE_URL` is missing.
+- Developers must not assume a database exists in early phases; code
+  that needs persistence lands together with the requirement flip.
+
 
 ---
 

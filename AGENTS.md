@@ -438,7 +438,9 @@ interface PaginatedDto<T> {
 
 ## Testing Requirements
 
-### Backend Testing (Jest)
+### Backend Testing (Vitest)
+
+Vitest is the single test runner across the monorepo (NestJS 12 packages are ESM-only; Vitest runs them natively). Globals (`describe`, `it`, `expect`) are enabled via `vitest/globals` - no imports needed.
 
 **Unit tests** - Test services in isolation:
 
@@ -733,12 +735,12 @@ it('should update task status to DONE', async () => {
 
 ```typescript
 // ✅ Good - Mock at boundary
-jest.mock('lib/email', () => ({
-  sendEmail: jest.fn(),
+vi.mock('lib/email', () => ({
+  sendEmail: vi.fn(),
 }));
 
 // ❌ Bad - Mock implementation details
-jest.spyOn(service, 'internalMethod').mockReturnValue(true);
+vi.spyOn(service, 'internalMethod').mockReturnValue(true);
 ```
 
 ---

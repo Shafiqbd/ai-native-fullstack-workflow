@@ -22,7 +22,7 @@ Contributing guidelines for the ai-native-fullstack-workflow project.
 
 Before you begin, ensure you have:
 
-- **Node.js** v20 LTS or higher
+- **Node.js** v24 LTS (>= 24.15) - see `.nvmrc`
 - **Yarn** v1.22+ or higher
 - **Docker** and **Docker Compose** (for local database)
 - **Git** for version control
@@ -291,7 +291,7 @@ Add screenshots for UI changes.
 
 ## Testing Requirements
 
-### Backend Testing (NestJS + Jest)
+### Backend Testing (NestJS + Vitest)
 
 **Unit tests** for services and business logic:
 

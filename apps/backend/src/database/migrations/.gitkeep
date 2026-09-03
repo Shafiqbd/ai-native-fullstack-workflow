@@ -1,0 +1,9 @@
+# Database migrations live in this folder.
+
+Rules (see AGENTS.md):
+- Never modify an existing migration; always add a new one.
+- Every migration must implement a working `down()` (reversible).
+- `synchronize` stays `false`; schema changes go through migrations only.
+
+Migrations are generated with the standalone DataSource in
+`../data-source.ts` (added in Phase 3 together with the first entities).

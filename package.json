@@ -1,0 +1,33 @@
+{
+  "name": "ai-native-fullstack-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "An AI-native software engineering workflow: GitHub issues to production-ready code through planning, coding, verification, review and CI quality gates.",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:packages": "yarn workspace @ai-workflow/shared-types build && yarn workspace @ai-workflow/shared-utils build",
+    "type-check": "yarn workspace @ai-workflow/shared-types type-check && yarn workspace @ai-workflow/shared-utils type-check && yarn workspace @ai-workflow/backend type-check && yarn workspace @ai-workflow/frontend type-check",
+    "lint": "yarn workspace @ai-workflow/backend lint && yarn workspace @ai-workflow/frontend lint",
+    "test": "yarn workspace @ai-workflow/shared-utils test && yarn workspace @ai-workflow/backend test",
+    "test:e2e": "yarn workspace @ai-workflow/backend test:e2e",
+    "build": "yarn build:packages && yarn workspace @ai-workflow/backend build && yarn workspace @ai-workflow/frontend build",
+    "verify": "bash scripts/verify.sh",
+    "dev:backend": "yarn workspace @ai-workflow/backend start:dev",
+    "dev:frontend": "yarn workspace @ai-workflow/frontend dev",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
+  }
+}

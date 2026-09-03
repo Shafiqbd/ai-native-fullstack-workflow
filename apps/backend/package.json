@@ -1,0 +1,43 @@
+{
+  "name": "@ai-workflow/backend",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "NestJS API for the ai-native-fullstack-workflow project management demo.",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config ./vitest.config.e2e.mts"
+  },
+  "dependencies": {
+    "@ai-workflow/shared-types": "0.1.0",
+    "@ai-workflow/shared-utils": "0.1.0",
+    "@nestjs/common": "^12.0.0",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^12.0.0",
+    "@nestjs/platform-express": "^12.0.0",
+    "@nestjs/typeorm": "^12.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "dotenv": "^16.4.5",
+    "pg": "^8.13.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^1.1.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/testing": "^12.0.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.11.10",
+    "@types/supertest": "^7.0.0",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "vitest": "^4.1.2"
+  }
+}

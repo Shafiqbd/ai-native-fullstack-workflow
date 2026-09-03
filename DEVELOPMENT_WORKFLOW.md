@@ -54,7 +54,7 @@ AI-Native Development Workflow for the ai-native-fullstack-workflow project.
                                         ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                          Verification Harness                                │
-│  • npm run verify                                                           │
+│  • yarn verify                                                           │
 │  • TypeScript type checking                                                 │
 │  • ESLint                                                                   │
 │  • Unit tests                                                               │
@@ -318,7 +318,7 @@ When a task is assigned to the Coding Agent:
    - Ensure test coverage
 
 6. **Run verification**
-   - Execute `npm run verify`
+   - Execute `yarn verify`
    - Fix any failures
 
 7. **Iterate on failures**
@@ -365,7 +365,7 @@ A task is complete only when:
 The verification command is:
 
 ```bash
-npm run verify
+yarn verify
 ```
 
 This command runs:

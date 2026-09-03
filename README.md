@@ -73,7 +73,7 @@ The demo application is a Project Management System with:
 - **PostgreSQL** - Relational database
 
 ### Testing
-- **Jest** - Unit and integration testing
+- **Vitest** - Unit, integration and E2E testing
 - **Playwright** - E2E testing
 
 ### Infrastructure
@@ -90,7 +90,7 @@ The demo application is a Project Management System with:
 
 ### Prerequisites
 
-- Node.js v20 LTS or higher
+- Node.js v24 LTS (>= 24.15) - see `.nvmrc`
 - Yarn v1.22+
 - Docker and Docker Compose
 - Git
@@ -105,30 +105,37 @@ cd ai-native-fullstack-workflow
 # Install dependencies
 yarn install
 
-# Start PostgreSQL
-docker-compose up -d postgres
-
 # Set up environment
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your configuration (or leave as-is to start
+# without a database - the API boots without persistence until
+# DATABASE_URL is set)
 
-# Run database migrations
-yarn migration:run
+# Optional: start PostgreSQL via Docker
+yarn db:up
 ```
+
+### Local PostgreSQL without Docker
+
+```bash
+sudo -u postgres psql
+  CREATE USER dev WITH PASSWORD 'dev_password';
+  CREATE DATABASE ai_workflow_dev OWNER dev;
+  \q
+```
+
+The backend connects to PostgreSQL automatically whenever
+`DATABASE_URL` is present in `.env`.
 
 ### Development
 
 ```bash
-# Start backend (Terminal 1)
-cd apps/backend
-yarn start:dev
-
-# Start frontend (Terminal 2)
-cd apps/frontend
-yarn dev
+# From the repository root
+yarn dev:backend    # NestJS API on http://localhost:3001
+yarn dev:frontend   # Next.js app on http://localhost:3000
 ```
 
-Visit http://localhost:3000 for the frontend and http://localhost:3001 for the API.
+Visit http://localhost:3000 for the frontend and http://localhost:3001/api/health for the API.
 
 ---
 
@@ -217,12 +224,18 @@ ai-native-fullstack-workflow/
 - [x] AI agent rules
 - [x] Development workflow
 
-### Phase 2: Infrastructure (Planned)
+### Phase 2: Infrastructure ✅
 
-- [ ] Monorepo setup (Yarn workspaces)
-- [ ] TypeScript configuration
-- [ ] ESLint configuration
-- [ ] Docker Compose for PostgreSQL
+- [x] Yarn workspaces monorepo (`apps/*`, `packages/*`)
+- [x] Strict TypeScript configuration (`tsconfig.base.json`)
+- [x] Shared ESLint config enforcing AGENTS.md rules
+- [x] Shared types and utilities packages
+- [x] NestJS 12 backend skeleton with health endpoint + tests
+- [x] Next.js 16 frontend skeleton with live backend status page
+- [x] Vitest test setup (unit + e2e)
+- [x] Verification harness (`yarn verify` - 6 gates, PASS/FAIL)
+- [x] Docker Compose for PostgreSQL
+- [x] Database-optional boot (API runs with or without DATABASE_URL)
 
 ### Phase 3: MVP Application (Planned)
 

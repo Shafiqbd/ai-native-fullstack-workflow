@@ -1,0 +1,31 @@
+# Local development database for ai-native-fullstack-workflow.
+#
+# Usage:
+#   yarn db:up      start PostgreSQL
+#   yarn db:down    stop and remove containers
+#
+# The credentials below match .env.example. Application services
+# (backend/frontend) run on the host during development; they will
+# be containerized in a later phase.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ai-workflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ai_workflow_dev
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dev -d ai_workflow_dev']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:

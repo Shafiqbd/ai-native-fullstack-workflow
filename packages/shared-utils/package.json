@@ -1,0 +1,21 @@
+{
+  "name": "@ai-workflow/shared-utils",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Pure utility functions shared between the frontend and backend applications.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.2"
+  }
+}
