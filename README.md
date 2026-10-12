@@ -224,6 +224,41 @@ See [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) for details.
 
 ---
 
+## GitHub Automation
+
+Two workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `ci.yml` | every PR, pushes to `main` | `yarn verify`; migrations up/down/up and CRUD e2e against PostgreSQL |
+| `ai-agent.yml` | `ai-agent` label, `@claude` comments | plans from the issue, then implements on approval and opens a PR |
+
+### Issue to pull request
+
+1. Open an issue with the **AI agent task** template.
+2. A maintainer reviews it and adds the `ai-agent` label. The planner
+   reads the issue and code and comments an *Implementation Specification*.
+3. The maintainer approves by commenting `@claude implement` (or asks for
+   changes first). The agent implements on a `feature/` branch, runs
+   `yarn verify`, and opens a PR that closes the issue.
+4. CI gates the PR; `@claude` on the PR requests follow-up changes.
+5. A human reviews and merges.
+
+Only users with write access can trigger the agent. Agent instructions
+come from [CLAUDE.md](CLAUDE.md), which imports [AGENTS.md](AGENTS.md).
+
+### One-time setup
+
+1. Add a repository secret `ANTHROPIC_API_KEY`
+   (Settings → Secrets and variables → Actions).
+2. Install the Claude GitHub App (https://github.com/apps/claude) on the
+   repository, or run `/install-github-app` in Claude Code.
+3. Create the `ai-agent` label (Issues → Labels).
+4. Recommended: protect `main` and require the CI checks
+   (`Verify (type-check, lint, tests, build)`, `Migrations + database e2e`).
+
+---
+
 ## Verification
 
 All changes must pass verification:
@@ -301,12 +336,12 @@ ai-native-fullstack-workflow/
 - [ ] E2E tests
 - [ ] Verification harness
 
-### Phase 5: AI Agent Integration (Planned)
+### Phase 5: AI Agent Integration (In progress)
 
 - [ ] MCP server
-- [ ] Planner Agent
-- [ ] Coding Agent integration
-- [ ] GitHub Actions workflows
+- [x] Planner Agent (`ai-agent` label posts an implementation spec)
+- [x] Coding Agent integration (`@claude` implements the spec and opens a PR)
+- [x] GitHub Actions workflows (CI quality gates + agent pipeline)
 
 ---
 

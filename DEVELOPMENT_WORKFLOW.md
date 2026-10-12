@@ -203,6 +203,22 @@ Need task assignment
 
 ---
 
+## Automation in this repository
+
+The phases below are wired up in `.github/workflows/ai-agent.yml`:
+
+- **Planning:** adding the `ai-agent` label runs the planner job. It has
+  read-only access to the code and may only comment on the issue.
+- **Approval:** a human comment containing `@claude` (for example
+  `@claude implement`) approves the specification. Comments from bots
+  never trigger implementation.
+- **Implementation:** the implement job follows [CLAUDE.md](CLAUDE.md), runs
+  `yarn verify` with a disposable PostgreSQL, and opens the PR.
+- **CI quality gates:** `.github/workflows/ci.yml` runs on every PR.
+
+MCP-based repository inspection is not wired up yet; the planner reads
+the code directly.
+
 ## Planning Phase
 
 ### Planner Agent Responsibilities

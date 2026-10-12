@@ -11,7 +11,8 @@ import { isDatabaseReachable } from '../support/db-reachable';
  * Full CRUD flow against a real PostgreSQL database.
  *
  * Skips itself (with a visible message) when DATABASE_URL is unset or
- * the server is unreachable, so `yarn test:e2e:db` can run anywhere.
+ * the server is unreachable, so `yarn test:e2e:db` can run anywhere —
+ * unless REQUIRE_DATABASE=true (CI), where that is a failure.
  * When reachable, migrations are applied first so the suite is
  * self-sufficient.
  */
@@ -22,6 +23,11 @@ describe('CRUD flow (e2e, database)', () => {
 
   beforeAll(async () => {
     databaseAvailable = await isDatabaseReachable(process.env.DATABASE_URL);
+    // CI sets REQUIRE_DATABASE so a missing database fails the gate
+    // instead of silently skipping it.
+    if (!databaseAvailable && process.env.REQUIRE_DATABASE === 'true') {
+      throw new Error('REQUIRE_DATABASE is set but PostgreSQL is unreachable.');
+    }
     if (!databaseAvailable) {
       console.warn(
         '  [crud.e2e] SKIPPED: DATABASE_URL is unset or PostgreSQL is unreachable.',
