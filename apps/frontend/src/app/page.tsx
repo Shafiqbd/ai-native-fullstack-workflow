@@ -1,6 +1,8 @@
+import Link from 'next/link';
 import type { ReactElement } from 'react';
 import StatusBadge from '@/components/StatusBadge';
 import { getHealth } from '@/lib/api-client';
+import { primaryButtonClass } from '@/lib/ui';
 
 /**
  * Home page: project overview plus a live view of the backend health
@@ -41,6 +43,17 @@ export default async function HomePage(): Promise<ReactElement> {
           autonomous planning, coding, testing, verification, AI review
           and CI quality gates.
         </p>
+        <div className="flex gap-3">
+          <Link href="/projects" className={primaryButtonClass}>
+            Open projects
+          </Link>
+          <Link
+            href="/users"
+            className="inline-flex items-center rounded-md px-4 py-2 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-100 dark:ring-slate-700 dark:hover:bg-slate-900"
+          >
+            Manage users
+          </Link>
+        </div>
       </header>
 
       <section aria-labelledby="status-heading" className="flex flex-col gap-3">

@@ -11,7 +11,10 @@
     "type-check": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "vitest run",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.mts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.mts",
+    "test:e2e:db": "vitest run --config ./vitest.config.e2e-db.mts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts"
   },
   "dependencies": {
     "@ai-workflow/shared-types": "0.1.0",

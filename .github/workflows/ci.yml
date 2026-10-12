@@ -1,0 +1,70 @@
+# CI quality gates (DEVELOPMENT_WORKFLOW.md, "CI Quality Gates").
+#
+# - verify:   the same harness agents and humans run locally (yarn verify).
+# - database: migrations up/down/up + CRUD e2e against a throwaway
+#             PostgreSQL. REQUIRE_DATABASE turns the suite's local
+#             "skip when unreachable" into a hard failure here.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (type-check, lint, tests, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn verify
+
+  database:
+    name: Migrations + database e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ai_workflow_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ai_workflow_ci
+      REQUIRE_DATABASE: 'true'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      # Entities import runtime values (TaskStatus) from shared-types.
+      - run: yarn build:packages
+      - name: Migrations are reversible (up, down, up)
+        run: |
+          yarn migration:run
+          yarn migration:revert
+          yarn migration:run
+      - run: yarn test:e2e:db

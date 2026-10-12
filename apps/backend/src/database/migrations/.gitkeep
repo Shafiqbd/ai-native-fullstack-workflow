@@ -5,5 +5,6 @@ Rules (see AGENTS.md):
 - Every migration must implement a working `down()` (reversible).
 - `synchronize` stays `false`; schema changes go through migrations only.
 
-Migrations are generated with the standalone DataSource in
-`../data-source.ts` (added in Phase 3 together with the first entities).
+Migrations run through the standalone DataSource in `../data-source.ts`
+(`yarn migration:run` / `yarn migration:revert`). Every new migration
+class must also be registered in `../schema.ts`.

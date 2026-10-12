@@ -1,0 +1,143 @@
+# AI agent pipeline (DEVELOPMENT_WORKFLOW.md, "Agent Workflows").
+#
+#   1. plan       A maintainer adds the `ai-agent` label to an issue.
+#                 Claude reads the issue and the codebase (read-only) and
+#                 posts an Implementation Specification as a comment.
+#   2. implement  A maintainer reviews the spec and approves it by
+#                 commenting `@claude` (e.g. "@claude implement the spec").
+#                 Claude implements on a feature/ branch, runs
+#                 `yarn verify`, and opens a PR. `@claude` on a PR asks for
+#                 follow-up changes. CI (ci.yml) then gates the PR and a
+#                 human approves the merge.
+#
+# Security (public repository):
+# - Only users with write access can trigger the action (its default);
+#   applying labels already requires triage access.
+# - The planner can read code and comment, nothing else.
+# - The issue text is never interpolated into the workflow; Claude reads
+#   it through `gh`, so issue content cannot inject workflow commands.
+#
+# Required repository secret: CLAUDE_CODE_OAUTH_TOKEN, created with
+# `claude setup-token` (Claude Pro/Max subscription; runs count against the
+# plan's usage limits instead of per-token API billing).
+name: AI agent
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  plan:
+    name: Plan (post implementation spec)
+    if: github.event_name == 'issues' && github.event.label.name == 'ai-agent'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: ai-agent-issue-${{ github.event.issue.number }}
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: |
+            You are the Planner Agent for issue #${{ github.event.issue.number }}
+            in ${{ github.repository }}.
+
+            1. Read the issue and its comments:
+               gh issue view ${{ github.event.issue.number }} --comments
+            2. Read AGENTS.md and DEVELOPMENT_WORKFLOW.md ("Planning Phase"),
+               then inspect the code the issue touches.
+            3. Post ONE comment on the issue with
+               gh issue comment ${{ github.event.issue.number }} --body-file <file>
+               containing an "## Implementation Specification" that follows the
+               "Specification Format" in DEVELOPMENT_WORKFLOW.md: overview,
+               acceptance criteria, tasks with files to modify, tests to add,
+               migrations needed, risks.
+            4. If the issue is ambiguous in a way that affects API design,
+               data integrity or security, list clarifying questions in that
+               comment instead of guessing, per AGENTS.md.
+            5. End the comment with:
+               "Reply `@claude implement` to approve this specification."
+
+            Do not modify files, create branches or open pull requests.
+          claude_args: >-
+            --model claude-sonnet-5-5
+            --max-turns 40
+            --allowedTools "Read,Glob,Grep,Write(/tmp/**),Bash(gh issue view:*),Bash(gh issue comment:*)"
+
+  implement:
+    name: Implement (on @claude)
+    # Bots are ignored so the planner's own "@claude implement" hint can
+    # never approve its specification; approval is always a human comment.
+    if: >-
+      github.event.sender.type != 'Bot' && (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: ai-agent-${{ github.event.issue.number || github.event.pull_request.number }}
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+    # A real database so the agent can run migrations and the DB e2e suite.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_PASSWORD: agent
+          POSTGRES_DB: ai_workflow_agent
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agent"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://agent:agent@localhost:5432/ai_workflow_agent
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn build:packages
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          # Matches the AGENTS.md branch strategy (feature/*).
+          branch_prefix: feature/
+          additional_permissions: |
+            actions: read
+          claude_args: >-
+            --model claude-sonnet-5-5
+            --max-turns 120
+            --allowedTools "Bash(yarn:*),Bash(git:*),Bash(gh issue view:*),Bash(gh pr view:*),Bash(gh pr create:*),Bash(gh pr checks:*)"

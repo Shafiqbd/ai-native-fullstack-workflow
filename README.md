@@ -137,6 +137,54 @@ yarn dev:frontend   # Next.js app on http://localhost:3000
 
 Visit http://localhost:3000 for the frontend and http://localhost:3001/api/health for the API.
 
+The UI has three areas: **Users** (`/users`), **Projects** (`/projects`)
+and a project page (`/projects/:id`) for creating tasks and changing their
+status or assignee inline. The CRUD pages need the API to run with a
+database; without one they show an error page with setup instructions.
+The frontend calls the API from the server only (`API_BASE_URL`).
+
+### Database migrations
+
+The schema is managed only through migrations (`synchronize` is off):
+
+```bash
+yarn migration:run      # apply pending migrations
+yarn migration:revert   # roll back the most recent migration
+```
+
+The backend reads `apps/backend/.env` first, then the repository-root `.env`.
+
+---
+
+## REST API
+
+All routes are prefixed with `/api`. The CRUD routes are mounted only when
+`DATABASE_URL` is set; without it the API exposes `/api/health` only.
+
+| Method | Path | Description | Success |
+|--------|------|-------------|---------|
+| GET | `/health` | Health report incl. database state | 200 |
+| GET | `/users?page&limit` | List users (paginated) | 200 |
+| GET | `/users/:id` | Get a user | 200 |
+| POST | `/users` | Create a user (`email`, `name`) | 201 |
+| PATCH | `/users/:id` | Update a user | 200 |
+| DELETE | `/users/:id` | Delete a user (409 if it owns projects or has tasks) | 204 |
+| GET | `/projects?page&limit&ownerId` | List projects | 200 |
+| GET | `/projects/:id` | Get a project | 200 |
+| POST | `/projects` | Create a project (`name`, `ownerId`, `description?`) | 201 |
+| PATCH | `/projects/:id` | Update a project | 200 |
+| DELETE | `/projects/:id` | Delete a project and its tasks | 204 |
+| GET | `/tasks?page&limit&projectId&status&assigneeId` | List tasks | 200 |
+| GET | `/tasks/:id` | Get a task | 200 |
+| POST | `/tasks` | Create a task (`title`, `projectId`, `status?`, `assigneeId?`) | 201 |
+| PATCH | `/tasks/:id` | Update a task (`assigneeId: null` unassigns) | 200 |
+| DELETE | `/tasks/:id` | Delete a task | 204 |
+
+List endpoints return `{ data, total, page, limit, totalPages }`
+(`Paginated<T>` in `@ai-workflow/shared-types`). Errors use the NestJS
+shape `{ statusCode, message, error }`: 400 validation, 404 missing
+resource or reference, 409 duplicate email / blocked delete.
+
 ---
 
 ## Documentation
@@ -173,6 +221,43 @@ AI agents follow the automated workflow:
 7. **Human Approval** is required for merge
 
 See [DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md) for details.
+
+---
+
+## GitHub Automation
+
+Two workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `ci.yml` | every PR, pushes to `main` | `yarn verify`; migrations up/down/up and CRUD e2e against PostgreSQL |
+| `ai-agent.yml` | `ai-agent` label, `@claude` comments | plans from the issue, then implements on approval and opens a PR |
+
+### Issue to pull request
+
+1. Open an issue with the **AI agent task** template.
+2. A maintainer reviews it and adds the `ai-agent` label. The planner
+   reads the issue and code and comments an *Implementation Specification*.
+3. The maintainer approves by commenting `@claude implement` (or asks for
+   changes first). The agent implements on a `feature/` branch, runs
+   `yarn verify`, and opens a PR that closes the issue.
+4. CI gates the PR; `@claude` on the PR requests follow-up changes.
+5. A human reviews and merges.
+
+Only users with write access can trigger the agent. Agent instructions
+come from [CLAUDE.md](CLAUDE.md), which imports [AGENTS.md](AGENTS.md).
+
+### One-time setup
+
+1. Run `claude setup-token` (requires a Claude Pro or Max subscription)
+   and add the printed token as the repository secret
+   `CLAUDE_CODE_OAUTH_TOKEN` (Settings → Secrets and variables → Actions).
+   Agent runs count against the subscription's usage limits.
+2. Install the Claude GitHub App (https://github.com/apps/claude) on the
+   repository, or run `/install-github-app` in Claude Code.
+3. Create the `ai-agent` label (Issues → Labels).
+4. Recommended: protect `main` and require the CI checks
+   (`Verify (type-check, lint, tests, build)`, `Migrations + database e2e`).
 
 ---
 
@@ -237,11 +322,14 @@ ai-native-fullstack-workflow/
 - [x] Docker Compose for PostgreSQL
 - [x] Database-optional boot (API runs with or without DATABASE_URL)
 
-### Phase 3: MVP Application (Planned)
+### Phase 3: MVP Application ✅
 
-- [ ] Basic CRUD for Users, Projects, Tasks
-- [ ] REST API
-- [ ] Basic UI
+- [x] Basic CRUD for Users, Projects, Tasks (entities, initial migration)
+- [x] REST API (validation, pagination, filters, 404/409 mapping)
+- [x] Unit tests for services + database-gated CRUD e2e (`yarn test:e2e:db`)
+- [x] Basic UI: users, projects and project detail with tasks (server
+      components + server actions, inline status/assignee editing)
+- [x] Frontend unit tests (Vitest) for API client, form parsing and action errors
 
 ### Phase 4: Testing & Verification (Planned)
 
@@ -250,12 +338,12 @@ ai-native-fullstack-workflow/
 - [ ] E2E tests
 - [ ] Verification harness
 
-### Phase 5: AI Agent Integration (Planned)
+### Phase 5: AI Agent Integration (In progress)
 
 - [ ] MCP server
-- [ ] Planner Agent
-- [ ] Coding Agent integration
-- [ ] GitHub Actions workflows
+- [x] Planner Agent (`ai-agent` label posts an implementation spec)
+- [x] Coding Agent integration (`@claude` implements the spec and opens a PR)
+- [x] GitHub Actions workflows (CI quality gates + agent pipeline)
 
 ---
 
