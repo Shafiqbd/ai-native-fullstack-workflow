@@ -1,8 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
 import type { HealthReport } from '@ai-workflow/shared-types';
-// Value import required: NestJS emits design:paramtypes metadata from
-// constructor parameter types, and `import type` erases that metadata.
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { AppService } from './app.service';
 
 /**

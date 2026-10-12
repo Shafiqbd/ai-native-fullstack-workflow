@@ -137,6 +137,48 @@ yarn dev:frontend   # Next.js app on http://localhost:3000
 
 Visit http://localhost:3000 for the frontend and http://localhost:3001/api/health for the API.
 
+### Database migrations
+
+The schema is managed only through migrations (`synchronize` is off):
+
+```bash
+yarn migration:run      # apply pending migrations
+yarn migration:revert   # roll back the most recent migration
+```
+
+The backend reads `apps/backend/.env` first, then the repository-root `.env`.
+
+---
+
+## REST API
+
+All routes are prefixed with `/api`. The CRUD routes are mounted only when
+`DATABASE_URL` is set; without it the API exposes `/api/health` only.
+
+| Method | Path | Description | Success |
+|--------|------|-------------|---------|
+| GET | `/health` | Health report incl. database state | 200 |
+| GET | `/users?page&limit` | List users (paginated) | 200 |
+| GET | `/users/:id` | Get a user | 200 |
+| POST | `/users` | Create a user (`email`, `name`) | 201 |
+| PATCH | `/users/:id` | Update a user | 200 |
+| DELETE | `/users/:id` | Delete a user (409 if it owns projects or has tasks) | 204 |
+| GET | `/projects?page&limit&ownerId` | List projects | 200 |
+| GET | `/projects/:id` | Get a project | 200 |
+| POST | `/projects` | Create a project (`name`, `ownerId`, `description?`) | 201 |
+| PATCH | `/projects/:id` | Update a project | 200 |
+| DELETE | `/projects/:id` | Delete a project and its tasks | 204 |
+| GET | `/tasks?page&limit&projectId&status&assigneeId` | List tasks | 200 |
+| GET | `/tasks/:id` | Get a task | 200 |
+| POST | `/tasks` | Create a task (`title`, `projectId`, `status?`, `assigneeId?`) | 201 |
+| PATCH | `/tasks/:id` | Update a task (`assigneeId: null` unassigns) | 200 |
+| DELETE | `/tasks/:id` | Delete a task | 204 |
+
+List endpoints return `{ data, total, page, limit, totalPages }`
+(`Paginated<T>` in `@ai-workflow/shared-types`). Errors use the NestJS
+shape `{ statusCode, message, error }`: 400 validation, 404 missing
+resource or reference, 409 duplicate email / blocked delete.
+
 ---
 
 ## Documentation
@@ -237,10 +279,11 @@ ai-native-fullstack-workflow/
 - [x] Docker Compose for PostgreSQL
 - [x] Database-optional boot (API runs with or without DATABASE_URL)
 
-### Phase 3: MVP Application (Planned)
+### Phase 3: MVP Application (In progress)
 
-- [ ] Basic CRUD for Users, Projects, Tasks
-- [ ] REST API
+- [x] Basic CRUD for Users, Projects, Tasks (entities, initial migration)
+- [x] REST API (validation, pagination, filters, 404/409 mapping)
+- [x] Unit tests for services + database-gated CRUD e2e (`yarn test:e2e:db`)
 - [ ] Basic UI
 
 ### Phase 4: Testing & Verification (Planned)

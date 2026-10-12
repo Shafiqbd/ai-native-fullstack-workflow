@@ -17,12 +17,15 @@
     "lint": "yarn workspace @ai-workflow/backend lint && yarn workspace @ai-workflow/frontend lint",
     "test": "yarn workspace @ai-workflow/shared-utils test && yarn workspace @ai-workflow/backend test",
     "test:e2e": "yarn workspace @ai-workflow/backend test:e2e",
+    "test:e2e:db": "yarn workspace @ai-workflow/backend test:e2e:db",
     "build": "yarn build:packages && yarn workspace @ai-workflow/backend build && yarn workspace @ai-workflow/frontend build",
     "verify": "bash scripts/verify.sh",
     "dev:backend": "yarn workspace @ai-workflow/backend start:dev",
     "dev:frontend": "yarn workspace @ai-workflow/frontend dev",
     "db:up": "docker compose up -d postgres",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "migration:run": "yarn workspace @ai-workflow/backend migration:run",
+    "migration:revert": "yarn workspace @ai-workflow/backend migration:revert"
   },
   "devDependencies": {
     "eslint": "^9.39.5",

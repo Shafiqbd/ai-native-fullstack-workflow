@@ -39,7 +39,8 @@ export interface User {
 export interface Project {
   id: number;
   name: string;
-  description?: string;
+  /** Absent column value serializes as JSON null. */
+  description?: string | null;
   ownerId: number;
   createdAt: string;
   updatedAt: string;
@@ -49,10 +50,12 @@ export interface Project {
 export interface Task {
   id: number;
   title: string;
-  description?: string;
+  /** Absent column value serializes as JSON null. */
+  description?: string | null;
   status: TaskStatus;
   projectId: number;
-  assigneeId?: number;
+  /** JSON null when the task is unassigned. */
+  assigneeId?: number | null;
   createdAt: string;
   updatedAt: string;
 }

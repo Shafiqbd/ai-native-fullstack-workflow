@@ -1,16 +1,16 @@
-import type { DynamicModule} from '@nestjs/common';
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'node:path';
+import { ENTITIES, MIGRATIONS } from './schema';
 
 /**
  * Registers the PostgreSQL (TypeORM) connection.
  *
  * The database is optional at boot: when DATABASE_URL is not set the
  * module registers no connection and the API starts without
- * persistence. This keeps the skeleton phase and CI runs deterministic
- * without a database service. Phase 3 (entities) will turn the
- * database into a hard requirement.
+ * persistence (skeleton mode, used by CI and the default e2e gate).
+ * When DATABASE_URL IS set but the server is unreachable, boot fails
+ * fast (2 retries, 1s apart) with a clear error instead of hanging —
+ * a misconfigured database must never look like a healthy API.
  *
  * AGENTS.md rules encoded here:
  * - `synchronize: false`  -> schema changes only via migrations.
@@ -19,7 +19,8 @@ import { join } from 'node:path';
 @Module({})
 export class DatabaseModule {
   static register(): DynamicModule {
-    if (!process.env.DATABASE_URL) {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
       return { module: DatabaseModule };
     }
 
@@ -28,11 +29,13 @@ export class DatabaseModule {
       imports: [
         TypeOrmModule.forRoot({
           type: 'postgres',
-          url: process.env.DATABASE_URL,
-          entities: [join(__dirname, '../**/*.entity{.ts,.js}')],
-          migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
+          url: databaseUrl,
+          entities: ENTITIES,
+          migrations: MIGRATIONS,
           migrationsRun: false,
           synchronize: false,
+          retryAttempts: 2,
+          retryDelay: 1_000,
           logging: process.env.NODE_ENV === 'production' ? ['error'] : ['error', 'warn'],
         }),
       ],
