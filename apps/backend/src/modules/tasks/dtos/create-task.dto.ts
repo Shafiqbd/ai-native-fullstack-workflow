@@ -9,9 +9,10 @@ import {
   Min,
 } from 'class-validator';
 import { TaskStatus } from '@ai-workflow/shared-types';
+import type { CreateTaskInput } from '@ai-workflow/shared-types';
 
 /** Body for POST /api/tasks. */
-export class CreateTaskDto {
+export class CreateTaskDto implements CreateTaskInput {
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)

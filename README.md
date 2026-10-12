@@ -137,6 +137,12 @@ yarn dev:frontend   # Next.js app on http://localhost:3000
 
 Visit http://localhost:3000 for the frontend and http://localhost:3001/api/health for the API.
 
+The UI has three areas: **Users** (`/users`), **Projects** (`/projects`)
+and a project page (`/projects/:id`) for creating tasks and changing their
+status or assignee inline. The CRUD pages need the API to run with a
+database; without one they show an error page with setup instructions.
+The frontend calls the API from the server only (`API_BASE_URL`).
+
 ### Database migrations
 
 The schema is managed only through migrations (`synchronize` is off):
@@ -279,12 +285,14 @@ ai-native-fullstack-workflow/
 - [x] Docker Compose for PostgreSQL
 - [x] Database-optional boot (API runs with or without DATABASE_URL)
 
-### Phase 3: MVP Application (In progress)
+### Phase 3: MVP Application ✅
 
 - [x] Basic CRUD for Users, Projects, Tasks (entities, initial migration)
 - [x] REST API (validation, pagination, filters, 404/409 mapping)
 - [x] Unit tests for services + database-gated CRUD e2e (`yarn test:e2e:db`)
-- [ ] Basic UI
+- [x] Basic UI: users, projects and project detail with tasks (server
+      components + server actions, inline status/assignee editing)
+- [x] Frontend unit tests (Vitest) for API client, form parsing and action errors
 
 ### Phase 4: Testing & Verification (Planned)
 

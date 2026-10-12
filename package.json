@@ -15,7 +15,7 @@
     "build:packages": "yarn workspace @ai-workflow/shared-types build && yarn workspace @ai-workflow/shared-utils build",
     "type-check": "yarn workspace @ai-workflow/shared-types type-check && yarn workspace @ai-workflow/shared-utils type-check && yarn workspace @ai-workflow/backend type-check && yarn workspace @ai-workflow/frontend type-check",
     "lint": "yarn workspace @ai-workflow/backend lint && yarn workspace @ai-workflow/frontend lint",
-    "test": "yarn workspace @ai-workflow/shared-utils test && yarn workspace @ai-workflow/backend test",
+    "test": "yarn workspace @ai-workflow/shared-utils test && yarn workspace @ai-workflow/backend test && yarn workspace @ai-workflow/frontend test",
     "test:e2e": "yarn workspace @ai-workflow/backend test:e2e",
     "test:e2e:db": "yarn workspace @ai-workflow/backend test:e2e:db",
     "build": "yarn build:packages && yarn workspace @ai-workflow/backend build && yarn workspace @ai-workflow/frontend build",

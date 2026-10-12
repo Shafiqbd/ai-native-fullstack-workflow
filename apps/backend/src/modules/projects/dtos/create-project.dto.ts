@@ -5,9 +5,10 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
+import type { CreateProjectInput } from '@ai-workflow/shared-types';
 
 /** Body for POST /api/projects. */
-export class CreateProjectDto {
+export class CreateProjectDto implements CreateProjectInput {
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)

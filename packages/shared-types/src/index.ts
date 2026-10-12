@@ -77,3 +77,50 @@ export interface Paginated<T> {
   limit: number;
   totalPages: number;
 }
+
+// ---------------------------------------------------------------------
+// Request bodies (implemented by the backend DTOs, sent by the frontend)
+// ---------------------------------------------------------------------
+
+/** Body for `POST /api/users`. */
+export interface CreateUserInput {
+  email: string;
+  name: string;
+}
+
+/** Body for `PATCH /api/users/:id`; omitted fields stay unchanged. */
+export interface UpdateUserInput {
+  email?: string;
+  name?: string;
+}
+
+/** Body for `POST /api/projects`. */
+export interface CreateProjectInput {
+  name: string;
+  description?: string;
+  ownerId: number;
+}
+
+/** Body for `PATCH /api/projects/:id`; `description: null` clears it. */
+export interface UpdateProjectInput {
+  name?: string;
+  description?: string | null;
+  ownerId?: number;
+}
+
+/** Body for `POST /api/tasks`. Status defaults to TODO. */
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  projectId: number;
+  assigneeId?: number | null;
+}
+
+/** Body for `PATCH /api/tasks/:id`; `assigneeId: null` unassigns. */
+export interface UpdateTaskInput {
+  title?: string;
+  description?: string | null;
+  status?: TaskStatus;
+  assigneeId?: number | null;
+}

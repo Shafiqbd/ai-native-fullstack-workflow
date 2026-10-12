@@ -9,13 +9,14 @@ import {
   Min,
 } from 'class-validator';
 import { TaskStatus } from '@ai-workflow/shared-types';
+import type { UpdateTaskInput } from '@ai-workflow/shared-types';
 
 /**
  * Body for PATCH /api/tasks/:id. All fields optional. An explicit
  * `"assigneeId": null` unassigns the task (validated as optional),
  * while omitting the field leaves it unchanged.
  */
-export class UpdateTaskDto {
+export class UpdateTaskDto implements UpdateTaskInput {
   @IsOptional()
   @IsString()
   @IsNotEmpty()

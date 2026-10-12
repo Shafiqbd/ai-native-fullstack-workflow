@@ -5,9 +5,10 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
+import type { UpdateProjectInput } from '@ai-workflow/shared-types';
 
 /** Body for PATCH /api/projects/:id. All fields optional. */
-export class UpdateProjectDto {
+export class UpdateProjectDto implements UpdateProjectInput {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
