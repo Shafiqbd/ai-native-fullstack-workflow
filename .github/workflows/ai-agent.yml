@@ -17,7 +17,9 @@
 # - The issue text is never interpolated into the workflow; Claude reads
 #   it through `gh`, so issue content cannot inject workflow commands.
 #
-# Required repository secret: ANTHROPIC_API_KEY.
+# Required repository secret: CLAUDE_CODE_OAUTH_TOKEN, created with
+# `claude setup-token` (Claude Pro/Max subscription; runs count against the
+# plan's usage limits instead of per-token API billing).
 name: AI agent
 
 on:
@@ -50,7 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           prompt: |
             You are the Planner Agent for issue #${{ github.event.issue.number }}
@@ -129,7 +131,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           # Matches the AGENTS.md branch strategy (feature/*).
           branch_prefix: feature/

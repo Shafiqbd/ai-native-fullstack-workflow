@@ -249,8 +249,10 @@ come from [CLAUDE.md](CLAUDE.md), which imports [AGENTS.md](AGENTS.md).
 
 ### One-time setup
 
-1. Add a repository secret `ANTHROPIC_API_KEY`
-   (Settings → Secrets and variables → Actions).
+1. Run `claude setup-token` (requires a Claude Pro or Max subscription)
+   and add the printed token as the repository secret
+   `CLAUDE_CODE_OAUTH_TOKEN` (Settings → Secrets and variables → Actions).
+   Agent runs count against the subscription's usage limits.
 2. Install the Claude GitHub App (https://github.com/apps/claude) on the
    repository, or run `/install-github-app` in Claude Code.
 3. Create the `ai-agent` label (Issues → Labels).
